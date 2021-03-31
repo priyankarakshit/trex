@@ -8,8 +8,6 @@ var ground, invisibleGround, groundImage;
 var cloudsGroup, cloudImage;
 var obstaclesGroup, obstacle1, obstacle2, obstacle3, obstacle4, obstacle5, obstacle6;
 
-var jumpSound;
-
 var score=0;
 
 var gameOver, restart;
@@ -33,8 +31,6 @@ function preload(){
   
   gameOverImg = loadImage("gameOver.png");
   restartImg = loadImage("restart.png");
-  
-  jumpSound = loadSound("jump.mp3");
 }
 
 function setup() {
@@ -42,12 +38,11 @@ function setup() {
   
   trex = createSprite(50,height-70,20,50);
   
-  
   trex.addAnimation("running", trex_running);
   trex.addAnimation("collided", trex_collided);
   trex.scale = 0.5;
   
-  ground = createSprite(width/2,height,width,20);
+  ground = createSprite(width/2,height-20,width,20);
   ground.addImage("ground",groundImage);
   ground.x = ground.width /2;
   ground.velocityX = -(6 + 3*score/100);
@@ -58,8 +53,8 @@ function setup() {
   restart = createSprite(width/2,height/2);
   restart.addImage(restartImg);
   
-  gameOver.scale = 0.7;
-  restart.scale = 0.7;
+  gameOver.scale = 0.5;
+  restart.scale = 0.5;
 
   gameOver.visible = false;
   restart.visible = false;
@@ -71,14 +66,19 @@ function setup() {
   obstaclesGroup = new Group();
   
   score = 0;
-  trex.setCollider(rect,100,100,20,20);
-  trex.debug = true;
-  
+}
 
-    if((touches.length > 0 || keyDown('SPACE')) && trex.y > height-65){
-      jumpSound.play();
-      trex.velocityY = -10;
-      touches = [];
+function draw() {
+  //trex.debug = true;
+  background(255);
+  text("Score: "+ score, 500,50);
+  
+  if (gameState===PLAY){
+    score = score + Math.round(getFrameRate()/60);
+    ground.velocityX = -(6 + 3*score/100);
+  
+    if(keyDown("space") && trex.y >= 159) {
+      trex.velocityY = -12;
     }
   
     trex.velocityY = trex.velocityY + 0.8
@@ -94,8 +94,8 @@ function setup() {
     if(obstaclesGroup.isTouching(trex)){
         gameState = END;
     }
-  } 
- else if (gameState === END) {
+  }
+  else if (gameState === END) {
     gameOver.visible = true;
     restart.visible = true;
     
